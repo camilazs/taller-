@@ -1,0 +1,23 @@
+# Change this globally unique app name before deploying.
+app = "spaceai-grpc-change-me"
+primary_region = "mia"
+kill_signal = "SIGTERM"
+[build]
+  dockerfile = "Dockerfile.grpc"
+[env]
+  GRPC_BIND = "0.0.0.0:50051"
+  DATA_DIR = "/data"
+[[mounts]]
+  source = "spaceai_data"
+  destination = "/data"
+[[services]]
+  internal_port = 50051
+  protocol = "tcp"
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+    [services.ports.http_options]
+      h2_backend = true
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

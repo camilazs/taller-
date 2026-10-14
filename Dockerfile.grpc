@@ -1,0 +1,12 @@
+FROM node:24-alpine
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY backend ./backend
+COPY lib ./lib
+COPY proto ./proto
+COPY tsconfig.json ./
+ENV GRPC_BIND=0.0.0.0:50051
+ENV DATA_DIR=/data
+EXPOSE 50051
+CMD ["node", "--import", "tsx", "backend/server.ts"]

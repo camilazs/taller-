@@ -1,0 +1,18 @@
+syntax = "proto3";
+package spaceai;
+service ProjectService {
+ rpc CreateProject(CreateProjectRequest) returns (Project);
+ rpc GetProjects(Empty) returns (ProjectList);
+ rpc GetProject(ProjectId) returns (Project);
+ rpc SaveScene(SaveSceneRequest) returns (SceneResponse);
+ rpc GetScene(ProjectId) returns (SceneResponse);
+ rpc DeleteProject(ProjectId) returns (Empty);
+}
+message Empty {}
+message ProjectId { string id = 1; }
+message CreateProjectRequest { string name = 1; }
+message Project { string id = 1; string name = 2; string createdAt = 3; string updatedAt = 4; }
+message ProjectList { repeated Project projects = 1; }
+// Scene JSON is validated against the shared Zod schema on every write.
+message SaveSceneRequest { string id = 1; string sceneJson = 2; }
+message SceneResponse { string id = 1; string sceneJson = 2; }

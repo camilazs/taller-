@@ -1,0 +1,53 @@
+{
+  "isInterior": true,
+  "roomType": "PRUEBA · Sala",
+  "summary": "DATOS DE PRUEBA: fixture escrito a mano para verificar el flujo. No es un análisis real de esta fotografía ni una detección de IA.",
+  "room": {
+    "width": 6,
+    "depth": 5,
+    "height": 2.8,
+    "floorVisible": true,
+    "visibleWallCount": 2
+  },
+  "objects": [
+    {
+      "label": "Sofá de prueba",
+      "kind": "sofa",
+      "u": 0.25,
+      "v": 0.3,
+      "rotation": 0,
+      "width": 2.2,
+      "depth": 0.9,
+      "height": 0.85,
+      "color": "#7c9186",
+      "confidence": "medium"
+    },
+    {
+      "label": "Mesa de prueba",
+      "kind": "table",
+      "u": 0.6,
+      "v": 0.65,
+      "rotation": 30,
+      "width": 1.5,
+      "depth": 0.9,
+      "height": 0.8,
+      "color": "#b88a5b",
+      "confidence": "low"
+    },
+    {
+      "label": "Lámpara de prueba",
+      "kind": "unsupported",
+      "u": 0.9,
+      "v": 0.4,
+      "rotation": 0,
+      "width": 0.4,
+      "depth": 0.4,
+      "height": 1.6,
+      "color": "#bbbbbb",
+      "confidence": "medium"
+    }
+  ],
+  "warnings": [
+    "PRUEBA: dimensiones y posiciones inventadas exclusivamente para verificar el convertidor; no describen la fotografía."
+  ]
+}
