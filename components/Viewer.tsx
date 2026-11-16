@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid, ContactShadows } from "@react-three/drei";
 import { useState } from "react";
 import type { Furniture, Scene } from "@/lib/scene";
+import GeneratedMesh from "./GeneratedMesh";
 function Box({
   position,
   size,
@@ -23,10 +24,12 @@ function Item({
   o,
   selected,
   onSelect,
+  password,
 }: {
   o: Furniture;
   selected: boolean;
   onSelect: () => void;
+  password: string;
 }) {
   const w = o.width,
     d = o.depth,
@@ -41,7 +44,7 @@ function Item({
         onSelect();
       }}
     >
-      {o.kind === "plant" ? (
+      {o.meshId ? <GeneratedMesh item={o} password={password} /> : o.kind === "plant" ? (
         <>
           <mesh position={[0, h * 0.2, 0]} castShadow>
             <cylinderGeometry args={[w * 0.35, w * 0.25, h * 0.4, 20]} />
@@ -134,10 +137,12 @@ export default function Viewer({
   scene,
   selected,
   onSelect,
+  password,
 }: {
   scene: Scene;
   selected: string | null;
   onSelect: (id: string | null) => void;
+  password: string;
 }) {
   const [failed, setFailed] = useState(false);
   if (failed)
@@ -189,6 +194,7 @@ export default function Viewer({
             o={o}
             selected={selected === o.id}
             onSelect={() => onSelect(o.id)}
+            password={password}
           />
         ))}
       </group>

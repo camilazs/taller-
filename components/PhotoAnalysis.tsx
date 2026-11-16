@@ -1,14 +1,17 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Box, Check, Sparkles, Upload } from "lucide-react";
+import { Box, Camera, Check, Sparkles, Upload } from "lucide-react";
 import { analysisSchema, analysisToScene, type Analysis } from "@/lib/analysis";
 import { imageMime, imageTypes, MAX_IMAGE_BYTES } from "@/lib/image";
 import { catalog, type Scene } from "@/lib/scene";
+import ImageToModel from "./ImageToModel";
 
 type Props = {
   configured: boolean;
   password: string;
   onGenerate: (scene: Scene) => void;
+  projectId: string;
+  onAddModel: (id: string) => void;
 };
 const confidence = { low: "baja", medium: "media", high: "alta" };
 
@@ -16,6 +19,8 @@ export default function PhotoAnalysis({
   configured,
   password,
   onGenerate,
+  projectId,
+  onAddModel,
 }: Props) {
   const [image, setImage] = useState("");
   const [filename, setFilename] = useState("");
@@ -181,7 +186,26 @@ export default function PhotoAnalysis({
           <h3>
             <Upload size={18} /> De fotografía a espacio
           </h3>
-          <p>Cargar → Analizar con IA → Revisar → Generar → Editar y guardar</p>
+          <p>
+            Capturar o cargar → Analizar con IA → Revisar → Generar 3D →
+            Organizar
+          </p>
+          <label
+            className={`upload-btn ${processing || reading ? "upload-disabled" : ""}`}
+          >
+            <Camera size={16} /> Tomar fotografía
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              capture="environment"
+              aria-label="Tomar fotografía del espacio"
+              disabled={processing || reading}
+              onChange={(e) => {
+                upload(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
           <label
             className={`upload-btn ${processing || reading ? "upload-disabled" : ""}`}
           >
@@ -201,7 +225,8 @@ export default function PhotoAnalysis({
             />
           </label>
           <small>
-            JPG, JPEG, PNG o WebP · Máximo 3 MB ·{" "}
+            En celulares compatibles se abre la cámara; en otros equipos puedes
+            seleccionar una imagen. JPG, JPEG, PNG o WebP · Máximo 3 MB ·{" "}
             {filename || "Vista previa local"}
           </small>
         </div>
@@ -219,7 +244,7 @@ export default function PhotoAnalysis({
           <p>
             {configured
               ? "Al analizar, la fotografía se envía al proveedor configurado. Se aplican las tarifas de tu cuenta."
-              : "Configura AI_API_KEY en .env.local y reinicia Next.js para usar análisis real. El editor manual sigue disponible."}
+              : "Configura las credenciales del proveedor en .env.local (ANTHROPIC_API_KEY para Claude) y reinicia Next.js. El editor manual sigue disponible."}
           </p>
           <button
             className="secondary"
@@ -251,6 +276,12 @@ export default function PhotoAnalysis({
           </div>
         )}
       </div>
+      <ImageToModel
+        image={image}
+        password={password}
+        projectId={projectId}
+        onAdd={onAddModel}
+      />
       {analysis && (
         <div className="analysis-review">
           <div className="analysis-heading">

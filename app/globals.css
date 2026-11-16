@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+.mesh-workflow { padding: 24px; border: 1px solid #c7d9c6; background: #f0f6ee; border-radius: 12px; margin: 20px 0; grid-column: 1 / -1; }
+.mesh-workflow h3 { font-size: 20px; margin-bottom: 12px; }
+.mesh-workflow p, .mesh-workflow small { display: block; line-height: 1.8; margin: 10px 0; }
+.mesh-workflow > button { margin: 15px 0; }
+.mesh-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.mesh-workflow progress { width: 100%; accent-color: #436b4e; }
+.mesh-loading { background: #fff; border-radius: 8px; padding: 12px; width: 200px; font-size: 12px; color: #304c3b; }
+
 .photo-workflow {
   grid-column: 1 / -1;
   min-width: 0;

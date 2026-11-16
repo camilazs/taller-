@@ -57,6 +57,14 @@ export default function Studio() {
     [dirty, setDirty] = useState(false),
     [mobile, setMobile] = useState(false);
   const item = scene.objects.find((o) => o.id === selected);
+  async function downloadSelectedModel() {
+    if (!item?.meshId) return;
+    try {
+      const response = await fetch(`/api/models/${item.meshId}?asset=1`, { headers: { "x-app-password": password } });
+      if (!response.ok) throw new Error("No se pudo descargar el modelo guardado. Revisa el acceso y el backend.");
+      const url = URL.createObjectURL(await response.blob()); const link = document.createElement("a"); link.href = url; link.download = `spaceai-${item.meshId}.glb`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) { setError((error as Error).message); }
+  }
   async function api(url: string, method = "GET", body?: unknown) {
     const res = await fetch(url, {
       method,
@@ -247,12 +255,11 @@ export default function Studio() {
                 <h1>
                   Tu próximo espacio
                   <br />
-                  empieza con una idea<span>.</span>
+                  empieza con una foto<span>.</span>
                 </h1>
                 <p>
-                  De una fotografía a una nueva perspectiva. Explora, organiza
-                  <br className="desktop" /> y dale forma a los espacios que
-                  imaginas.
+                  Captura tu habitación, analiza la imagen con IA y genera
+                  <br className="desktop" /> un espacio 3D editable para organizar tus muebles.
                 </p>
               </div>
               <div className="hero-art" aria-hidden="true">
@@ -381,12 +388,12 @@ export default function Studio() {
               <div>
                 <span>01</span>
                 <h3>Captura tu espacio</h3>
-                <p>Sube una fotografía del interior.</p>
+                <p>Toma o sube una fotografía del interior.</p>
               </div>
               <div>
                 <span>02</span>
-                <h3>Explora en 3D</h3>
-                <p>IA configurable o creación manual.</p>
+                <h3>Genera con IA</h3>
+                <p>Revisa las estimaciones y genera tu escena 3D.</p>
               </div>
               <div>
                 <span>03</span>
@@ -444,6 +451,7 @@ export default function Studio() {
                     scene={scene}
                     selected={selected}
                     onSelect={setSelected}
+                    password={password}
                   />
                   <div className="canvas-badge">
                     <Box size={15} /> SPACEAI / LIVE 3D
@@ -513,7 +521,7 @@ export default function Studio() {
                       >
                         {scene.objects.map((o, i) => (
                           <option key={o.id} value={o.id}>
-                            {catalog[o.kind].label} {i + 1}
+                            {o.name || catalog[o.kind].label} {i + 1}
                           </option>
                         ))}
                       </select>
@@ -574,6 +582,7 @@ export default function Studio() {
                         ))}
                       </div>
                       <div className="object-actions">
+                        {item.meshId && <button className="secondary" onClick={downloadSelectedModel}>Descargar modelo GLB</button>}
                         <label className="color-label">
                           Color
                           <input
@@ -625,7 +634,7 @@ export default function Studio() {
                       </option>
                       {scene.objects.map((o, i) => (
                         <option value={o.id} key={o.id}>
-                          {catalog[o.kind].label} {i + 1}
+                          {o.name || catalog[o.kind].label} {i + 1}
                         </option>
                       ))}
                     </select>
@@ -634,6 +643,14 @@ export default function Studio() {
               </aside>
               <PhotoAnalysis
                 key={active!.id}
+                projectId={active!.id}
+                onAddModel={(meshId) => {
+                  if (scene.objects.length >= 100) { setError("El proyecto admite hasta 100 objetos."); return; }
+                  const id = crypto.randomUUID();
+                  change({ ...scene, objects: [...scene.objects, { id, kind: "cabinet", meshId, name: "Modelo generado con IA", x: 0, z: 0, rotation: 0, width: 1, height: 1, depth: 1, color: "#ffffff" }] });
+                  setSelected(id);
+                  setMessage("Malla 3D añadida. Ajusta sus dimensiones y posición y guarda el proyecto.");
+                }}
                 configured={configured}
                 password={password}
                 onGenerate={(next) => {
@@ -646,9 +663,7 @@ export default function Studio() {
               />
             </div>
             <p className="disclaimer">
-              Una sola fotografía no permite una reconstrucción geométrica
-              exacta. Los muebles son geometrías aproximadas editables. La
-              fotografía no se guarda con el proyecto.
+              La generación con IA crea una malla GLB con texturas. Revisa sus caras ocultas y ajusta las dimensiones: una sola foto no proporciona medidas exactas. La distribución de habitación y las mallas generadas son herramientas complementarias.
             </p>
           </div>
         )}
