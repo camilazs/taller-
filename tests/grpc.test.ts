@@ -1,12 +1,15 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { rpc } from "../lib/grpc";
 import { emptyScene, sceneSchema, type Project } from "../lib/scene";
 import { analysisToScene } from "../lib/analysis";
 import fixture from "./fixtures/interior.json";
+import { fixtureGLB } from "./helpers/model-fixture";
+import { GET as getModel } from "../app/api/models/[id]/route";
+import { POST as createModel } from "../app/api/models/route";
 test("schema rejects invalid dimensions and object types", () => {
   assert.equal(
     sceneSchema.safeParse({ ...emptyScene, width: -2 }).success,
@@ -102,6 +105,27 @@ test("real gRPC: auth, all six RPCs, validation and disk persistence", async () 
     process.env.GRPC_TOKEN = "integration-secret";
     // Explicit test data, not an actual AI detection: conversion persists through real gRPC.
     const generated = analysisToScene(fixture).scene;
+    const meshId = "12345678-1234-4234-8234-123456789abc";
+    const glb = fixtureGLB(5 * 1024 * 1024);
+    // Archivo de prueba independiente de Meshy: comprueba transporte y persistencia reales.
+    await mkdir(path.join(dir, "models"), { recursive: true });
+    await writeFile(path.join(dir, "models", meshId + ".glb"), glb);
+    generated.objects[0].meshId = meshId;
+    generated.objects[0].name = "Malla de PRUEBA, no IA real";
+    const asset = await rpc<{ content: Buffer; size: number }>("GetModelAsset", { id: meshId });
+    assert.deepEqual(asset.content, glb);
+    assert.equal(asset.size, glb.length);
+    const modelStatus = await getModel(new Request(`http://localhost/api/models/${meshId}`), { params: Promise.resolve({ id: meshId }) });
+    assert.equal(modelStatus.status, 200);
+    assert.equal((await modelStatus.json()).stored, true);
+    const modelDownload = await getModel(new Request(`http://localhost/api/models/${meshId}?asset=1`), { params: Promise.resolve({ id: meshId }) });
+    assert.equal(modelDownload.headers.get("Content-Length"), null);
+    assert.equal(modelDownload.headers.get("Cache-Control"), "private, no-store");
+    assert.deepEqual(Buffer.from(await modelDownload.arrayBuffer()), glb);
+    assert.equal((await createModel(new Request("http://localhost/api/models", { method: "POST", headers: { "Content-Type": "application/json" }, body: '{}' }))).status, 503);
+    assert.equal((await rpc<{ content: Buffer }>("GetModelAsset", { id: meshId, metadataOnly: true })).content.length, 0);
+    await assert.rejects(rpc("StoreModelAsset", { id: "22345678-1234-4234-8234-123456789abc", url: "https://example.org/test.glb" }), /permitida/);
+    await assert.rejects(rpc("GetModelAsset", { id: "../../secret" }));
     await rpc("SaveScene", {
       id: project.id,
       sceneJson: JSON.stringify(generated),
@@ -116,6 +140,7 @@ test("real gRPC: auth, all six RPCs, validation and disk persistence", async () 
     await stop();
     child = launch();
     await ready();
+    assert.deepEqual((await rpc<{ content: Buffer }>("GetModelAsset", { id: meshId })).content, glb);
     assert.deepEqual(
       JSON.parse(
         (await rpc<{ sceneJson: string }>("GetScene", { id: project.id }))
