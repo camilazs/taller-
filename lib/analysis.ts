@@ -15,19 +15,33 @@ export const analysisSchema = z.strictObject({
   }),
   objects: z
     .array(
-      z.strictObject({
-        label: z.string().min(1).max(100),
-        kind: z.enum([...kinds, "unsupported"]),
-        // Estimated ground-plane positions, NOT image pixel coordinates.
-        u: z.number().finite().min(0).max(1),
-        v: z.number().finite().min(0).max(1),
-        rotation: z.number().finite().min(-360).max(360),
-        width: dimension,
-        depth: dimension,
-        height: dimension,
-        color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
-        confidence: z.enum(["low", "medium", "high"]),
-      }),
+      z.union([
+        z.strictObject({
+          label: z.string().min(1).max(100),
+          kind: z.enum(kinds),
+          u: z.number().finite().min(0).max(1),
+          v: z.number().finite().min(0).max(1),
+          rotation: z.number().finite().min(-360).max(360),
+          width: dimension,
+          depth: dimension,
+          height: dimension,
+          color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+          confidence: z.enum(["low", "medium", "high"]),
+        }),
+        // Thin unsupported objects (e.g. a picture frame) are observations, not scene meshes.
+        z.strictObject({
+          label: z.string().min(1).max(100),
+          kind: z.literal("unsupported"),
+          u: z.number().finite().min(0).max(1),
+          v: z.number().finite().min(0).max(1),
+          rotation: z.number().finite().min(-360).max(360),
+          width: z.number().finite().min(0.001).max(30),
+          depth: z.number().finite().min(0.001).max(30),
+          height: z.number().finite().min(0.001).max(30),
+          color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
+          confidence: z.enum(["low", "medium", "high"]),
+        }),
+      ]),
     )
     .max(60),
   warnings: z.array(z.string().min(1).max(300)).max(12),

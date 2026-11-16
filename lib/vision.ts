@@ -2,58 +2,10 @@
 import { z } from "zod";
 import { analysisSchema, type Analysis } from "./analysis";
 import { MAX_IMAGE_BYTES, MAX_REQUEST_BYTES, imageMime } from "./image";
-export class VisionError extends Error {
-  constructor(
-    message: string,
-    public status: number,
-    public code: string,
-  ) {
-    super(message);
-  }
-}
-export async function readBoundedJson(
-  response: Request | Response,
-  limit: number,
-): Promise<unknown> {
-  if (Number(response.headers.get("content-length") || 0) > limit)
-    throw new VisionError(
-      "El contenido supera el tamaño permitido.",
-      413,
-      "PAYLOAD_TOO_LARGE",
-    );
-  const reader = response.body?.getReader();
-  if (!reader)
-    throw new VisionError(
-      "No se recibió contenido JSON.",
-      400,
-      "INVALID_INPUT",
-    );
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      total += value.byteLength;
-      if (total > limit) {
-        await reader.cancel();
-        throw new VisionError(
-          "El contenido supera el tamaño permitido.",
-          413,
-          "PAYLOAD_TOO_LARGE",
-        );
-      }
-      chunks.push(value);
-    }
-  } finally {
-    reader.releaseLock();
-  }
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    throw new VisionError("Se recibió JSON inválido.", 400, "INVALID_JSON");
-  }
-}
+import { VisionError, readBoundedJson } from "./vision-common";
+export { VisionError, readBoundedJson } from "./vision-common";
+import { analyzeWithClaude } from "./anthropic";
+import { getVisionConfig } from "./ai-config";
 export async function readImage(request: Request): Promise<string> {
   const body = z
     .object({ image: z.string().max(MAX_REQUEST_BYTES) })
@@ -100,13 +52,20 @@ Solo incluye objetos visibles. Categorías: bed=cama, table=mesa, chair=silla, s
 u y v son posiciones relativas ESTIMADAS sobre un plano de suelo rectangular: u=0 izquierda, u=1 derecha; v=0 pared del fondo y v=1 frente. No son coordenadas de píxeles ni una medición de profundidad. Usa perspectiva y oclusiones como indicios, reconoce la incertidumbre. rotation son grados alrededor del eje vertical, 0 alineado con la habitación.
 No inventes muebles ocultos. confidence low/medium/high describe seguridad de identificación, no exactitud métrica. Si no es un interior, isInterior=false, objects=[], roomType="No identificada", summary explica por qué; usa room 6x5x2.8 solo como valores de esquema, no se generará una escena.`;
 export async function analyzeImage(image: string): Promise<Analysis> {
-  const key = process.env.AI_API_KEY;
+  const { provider, key } = getVisionConfig();
+  if (!["openai", "anthropic"].includes(provider))
+    throw new VisionError(
+      "AI_PROVIDER debe ser openai o anthropic.",
+      503,
+      "AI_CONFIGURATION",
+    );
   if (!key)
     throw new VisionError(
       "Análisis automático no configurado. Crea una habitación manualmente.",
       503,
       "AI_NOT_CONFIGURED",
     );
+  if (provider === "anthropic") return analyzeWithClaude(image, prompt);
   const base = new URL(process.env.AI_BASE_URL || "https://api.openai.com/v1");
   if (
     base.protocol !== "https:" &&

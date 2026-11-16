@@ -1,3 +1,4 @@
+import { getVisionConfig } from "@/lib/ai-config";
 import { authorize } from "@/lib/auth";
 import { analyzeImage, readImage, VisionError } from "@/lib/vision";
 export const runtime = "nodejs";
@@ -5,7 +6,7 @@ export const maxDuration = 60;
 export async function GET() {
   return Response.json(
     {
-      configured: Boolean(process.env.AI_API_KEY),
+      configured: Boolean(getVisionConfig().key),
       authRequired:
         Boolean(process.env.APP_PASSWORD) ||
         process.env.NODE_ENV === "production",
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
     );
   }
   try {
-    if (!process.env.AI_API_KEY)
+    if (!getVisionConfig().key)
       throw new VisionError(
         "Análisis automático no configurado. Crea una habitación manualmente.",
         503,

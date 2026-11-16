@@ -73,3 +73,19 @@ test("oversized furniture is reported; unknown models never become invented mesh
   assert.ok(result.warnings.some((w) => w.includes("superan")));
   assert.ok(result.scene.objects.every((o) => kinds.includes(o.kind)));
 });
+
+test("thin unsupported observations are reported without producing invalid scene meshes", () => {
+  const value = {
+    ...fixture,
+    objects: [{ ...fixture.objects[2], kind: "unsupported", depth: 0.03 }],
+  };
+  assert.equal(analysisSchema.safeParse(value).success, true);
+  assert.equal(analysisToScene(value).scene.objects.length, 0);
+  assert.equal(
+    analysisSchema.safeParse({
+      ...value,
+      objects: [{ ...value.objects[0], kind: "sofa" }],
+    }).success,
+    false,
+  );
+});
