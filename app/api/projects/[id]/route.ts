@@ -1,5 +1,6 @@
 import { rpc } from "@/lib/grpc";
 import { authorize } from "@/lib/auth";
+import { projectError } from "@/lib/project-error";
 import { sceneSchema } from "@/lib/scene";
 export const runtime = "nodejs";
 type Context = { params: Promise<{ id: string }> };
@@ -14,7 +15,7 @@ export async function GET(req: Request, ctx: Context) {
       scene: sceneSchema.parse(JSON.parse(result.sceneJson)),
     });
   } catch (e) {
-    return Response.json({ error: (e as Error).message }, { status: 400 });
+    return projectError(e);
   }
 }
 export async function PUT(req: Request, ctx: Context) {
@@ -26,7 +27,7 @@ export async function PUT(req: Request, ctx: Context) {
       await rpc("SaveScene", { id, sceneJson: JSON.stringify(scene) }),
     );
   } catch (e) {
-    return Response.json({ error: (e as Error).message }, { status: 400 });
+    return projectError(e);
   }
 }
 export async function DELETE(req: Request, ctx: Context) {
@@ -36,6 +37,6 @@ export async function DELETE(req: Request, ctx: Context) {
       await rpc("DeleteProject", { id: (await ctx.params).id }),
     );
   } catch (e) {
-    return Response.json({ error: (e as Error).message }, { status: 400 });
+    return projectError(e);
   }
 }

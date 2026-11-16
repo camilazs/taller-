@@ -1,12 +1,13 @@
 import { rpc } from "@/lib/grpc";
 import { authorize } from "@/lib/auth";
+import { projectError } from "@/lib/project-error";
 export const runtime = "nodejs";
 export async function GET(req: Request) {
   try {
     authorize(req);
     return Response.json(await rpc("GetProjects"));
   } catch (e) {
-    return Response.json({ error: (e as Error).message }, { status: 503 });
+    return projectError(e);
   }
 }
 export async function POST(req: Request) {
@@ -15,6 +16,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     return Response.json(await rpc("CreateProject", { name: body.name }));
   } catch (e) {
-    return Response.json({ error: (e as Error).message }, { status: 400 });
+    return projectError(e);
   }
 }
