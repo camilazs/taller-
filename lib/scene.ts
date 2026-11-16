@@ -18,6 +18,8 @@ export const sceneSchema = z.object({
       z.object({
         id: z.string().min(1).max(80),
         kind: z.enum(kinds),
+        meshId: z.string().uuid().optional(),
+        name: z.string().min(1).max(80).optional(),
         x: z.number().finite().min(-30).max(30),
         z: z.number().finite().min(-30).max(30),
         rotation: z.number().finite().min(-360).max(360),

@@ -13,9 +13,11 @@ import {
   rename,
   readdir,
   unlink,
+  stat,
 } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID, timingSafeEqual } from "node:crypto";
+import { downloadModel } from "../lib/model-file";
 const dir = path.resolve(process.env.DATA_DIR || "data");
 const file = (id: string) => {
   if (!/^[0-9a-f-]{36}$/.test(id))
@@ -45,8 +47,32 @@ async function persist(data: Stored) {
 }
 const server = new grpc.Server({
   "grpc.max_receive_message_length": 1024 * 1024,
+  "grpc.max_send_message_length": 34 * 1024 * 1024,
 });
+const modelFile = (id: string) => {
+  file(id);
+  return path.join(dir, "models", id + ".glb");
+};
+const modelWrites = new Map<string, Promise<object>>();
 const handlers: Record<string, (request: any) => Promise<object>> = {
+  async StoreModelAsset(r) {
+    const dest = modelFile(r.id);
+    try { const bytes = await readFile(dest); return { id: r.id, size: bytes.length }; } catch (e) { if ((e as NodeJS.ErrnoException).code !== "ENOENT") throw e; }
+    if (modelWrites.has(r.id)) return modelWrites.get(r.id)!;
+    const operation = (async () => {
+      const bytes = await downloadModel(r.url);
+      await mkdir(path.dirname(dest), { recursive: true });
+      const temp = dest + "." + randomUUID() + ".tmp";
+      await writeFile(temp, bytes); await rename(temp, dest);
+      return { id: r.id, size: bytes.length };
+    })();
+    modelWrites.set(r.id, operation);
+    try { return await operation; } finally { modelWrites.delete(r.id); }
+  },
+  async GetModelAsset(r) {
+    try { const source = modelFile(r.id); if (r.metadataOnly) return { id: r.id, size: (await stat(source)).size, content: Buffer.alloc(0) }; const bytes = await readFile(source); return { id: r.id, size: bytes.length, content: bytes }; }
+    catch (e) { if ((e as NodeJS.ErrnoException).code === "ENOENT") throw Object.assign(new Error("Modelo no encontrado"), { code: grpc.status.NOT_FOUND }); throw e; }
+  },
   async CreateProject(r) {
     const name = String(r.name || "").trim();
     if (!name || name.length > 100)
