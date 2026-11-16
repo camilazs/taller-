@@ -1,6 +1,12 @@
 # SpaceAI 3D
 
+Actualización: Claude ya está integrado y configurado localmente. Consulta [CLAUDE_DESPLIEGUE.md](CLAUDE_DESPLIEGUE.md) para variables, prueba real y despliegue. Las secciones anteriores sobre ausencia de credenciales describen el estado previo.
+
+Si el dashboard publicado no crea proyectos, consulta [DESPLIEGUE_URGENTE.md](DESPLIEGUE_URGENTE.md): el despliegue inicial en Vercel carecía de APP_PASSWORD y el backend gRPC aún no estaba desplegado. Las credenciales locales generadas para la aplicación están en archivos `.env.*` excluidos de Git; no son claves de un proveedor de IA.
+
 Organizador de espacios interiores con editor 3D, análisis opcional de fotografías mediante IA real y almacenamiento mediante **gRPC sobre HTTP/2**.
+
+**Nuevo: generación de mallas GLB con texturas desde fotografías mediante Meshy**, incorporación al organizador, descarga y persistencia binaria en el backend gRPC. Consulta [GENERACION_3D.md](GENERACION_3D.md) para activar el proveedor y conocer la validación pendiente con una cuenta real.
 
 ## Caso de estudio y objetivos
 
@@ -51,7 +57,7 @@ fly.toml             HTTP/2, TLS en proxy y volumen
 
 ## Limitaciones y alcance de IA
 
-**No es fotogrametría ni una reconstrucción geométrica exacta desde una imagen.** No genera mallas detalladas, GLB ni texturas. La IA estima tipo de habitación, medidas y muebles visibles; el visor los representa con geometrías paramétricas. Hay que revisar y corregir medidas. No hay detecciones inventadas cuando falta configuración.
+**El análisis de distribución no es fotogrametría ni una reconstrucción geométrica exacta desde una imagen.** En ese flujo, la IA estima tipo de habitación, medidas y muebles visibles; el visor los representa con geometrías paramétricas. El flujo adicional **Fotografía → modelo 3D con IA** sí integra generación de mallas GLB con texturas mediante Meshy. Ambos requieren revisar y corregir medidas. No hay detecciones ni mallas inventadas cuando falta configuración.
 
 La fotografía solo vive en la sesión del navegador y no se guarda con la escena. Al pulsar analizar se envía al proveedor configurado, que puede cobrar según la cuenta del usuario. No se realizan llamadas de IA al cargar la imagen. Por defecto se usa OpenAI Chat Completions con imágenes y **Structured Outputs (`json_schema`, estricto)**. Para proveedores compatibles que solo admitan modo JSON, configurar `AI_RESPONSE_FORMAT=json_object`; el esquema también se envía en el prompt y siempre se valida con Zod. No hay reintentos automáticos que generen llamadas adicionales.
 

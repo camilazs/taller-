@@ -1,0 +1,274 @@
+{
+  "provider": "anthropic",
+  "model": "claude-haiku-4-5-20251001",
+  "realApiCall": true,
+  "photoSource": "https://unsplash.com/photos/9M66C_w_ToM",
+  "elapsedMs": 14495,
+  "analysis": {
+    "isInterior": true,
+    "roomType": "Sala de estar",
+    "summary": "Sala de estar moderna y luminosa con grandes ventanales que ofrecen vista al jardín. El espacio está organizado alrededor de un sofá gris central con mesas laterales y mesa de centro de madera. La composición incluye sillas de madera, plantas decorativas, una lámpara de arco dorado, y elementos de decoración natural. El suelo es de cerámica tipo madera con una alfombra clara central. La iluminación natural es abundante gracias a los amplios vidrios.",
+    "room": {
+      "width": 6.5,
+      "depth": 8,
+      "height": 3,
+      "floorVisible": true,
+      "visibleWallCount": 3
+    },
+    "objects": [
+      {
+        "label": "Sofá gris central",
+        "kind": "sofa",
+        "u": 0.5,
+        "v": 0.5,
+        "rotation": 0,
+        "width": 2.8,
+        "depth": 1,
+        "height": 0.85,
+        "color": "#7a7a7a",
+        "confidence": "high"
+      },
+      {
+        "label": "Silla de madera y tela izquierda",
+        "kind": "chair",
+        "u": 0.2,
+        "v": 0.7,
+        "rotation": -20,
+        "width": 0.8,
+        "depth": 0.8,
+        "height": 0.9,
+        "color": "#8b6f47",
+        "confidence": "high"
+      },
+      {
+        "label": "Silla de madera derecha",
+        "kind": "chair",
+        "u": 0.8,
+        "v": 0.75,
+        "rotation": 25,
+        "width": 0.8,
+        "depth": 0.8,
+        "height": 0.9,
+        "color": "#8b6f47",
+        "confidence": "high"
+      },
+      {
+        "label": "Mesa de centro de madera",
+        "kind": "table",
+        "u": 0.5,
+        "v": 0.55,
+        "rotation": 0,
+        "width": 1.2,
+        "depth": 0.6,
+        "height": 0.45,
+        "color": "#a0733a",
+        "confidence": "high"
+      },
+      {
+        "label": "Pufés de cuero marrón",
+        "kind": "unsupported",
+        "u": 0.45,
+        "v": 0.58,
+        "rotation": 0,
+        "width": 0.5,
+        "depth": 0.5,
+        "height": 0.4,
+        "color": "#b8743d",
+        "confidence": "medium"
+      },
+      {
+        "label": "Mesa lateral madera izquierda",
+        "kind": "table",
+        "u": 0.15,
+        "v": 0.5,
+        "rotation": 0,
+        "width": 0.5,
+        "depth": 0.4,
+        "height": 0.6,
+        "color": "#8b6634",
+        "confidence": "medium"
+      },
+      {
+        "label": "Planta en maceta izquierda pared",
+        "kind": "plant",
+        "u": 0.15,
+        "v": 0.25,
+        "rotation": 0,
+        "width": 0.3,
+        "depth": 0.3,
+        "height": 0.5,
+        "color": "#2d5016",
+        "confidence": "medium"
+      },
+      {
+        "label": "Planta grande derecha",
+        "kind": "plant",
+        "u": 0.85,
+        "v": 0.3,
+        "rotation": 0,
+        "width": 0.6,
+        "depth": 0.5,
+        "height": 1.5,
+        "color": "#3a6b2f",
+        "confidence": "high"
+      },
+      {
+        "label": "Lámpara de arco dorada",
+        "kind": "unsupported",
+        "u": 0.65,
+        "v": 0.4,
+        "rotation": 80,
+        "width": 0.4,
+        "depth": 0.3,
+        "height": 2.2,
+        "color": "#d4af37",
+        "confidence": "high"
+      },
+      {
+        "label": "Cuadro horizontal pared",
+        "kind": "unsupported",
+        "u": 0.5,
+        "v": 0.15,
+        "rotation": 0,
+        "width": 1.8,
+        "depth": 0.05,
+        "height": 0.25,
+        "color": "#5a5a4a",
+        "confidence": "medium"
+      },
+      {
+        "label": "Planta pequeña decorativa centro",
+        "kind": "plant",
+        "u": 0.5,
+        "v": 0.55,
+        "rotation": 0,
+        "width": 0.2,
+        "depth": 0.2,
+        "height": 0.3,
+        "color": "#4a7c59",
+        "confidence": "medium"
+      }
+    ],
+    "warnings": [
+      "Las dimensiones de la habitación son estimaciones visuales basadas en perspectiva; no representan medidas verificadas",
+      "La profundidad exacta es difícil de determinar debido al ángulo de la cámara y la perspectiva forzada",
+      "Algunos elementos decorativos menores pueden no estar identificados completamente",
+      "La posición de elementos en el eje u-v es estimada a partir de la perspectiva visual, no de coordenadas precisas",
+      "La altura de algunos muebles es aproximada basándose en proporciones relativas",
+      "No se ha verificado la escala real de los objetos; las dimensiones son relativas al espacio estimado"
+    ]
+  },
+  "scene": {
+    "roomType": "Sala de estar",
+    "width": 6.5,
+    "depth": 8,
+    "height": 3,
+    "objects": [
+      {
+        "id": "detected-1",
+        "kind": "sofa",
+        "x": 0,
+        "z": 0,
+        "rotation": 0,
+        "width": 2.8,
+        "depth": 1,
+        "height": 0.85,
+        "color": "#7a7a7a"
+      },
+      {
+        "id": "detected-2",
+        "kind": "chair",
+        "x": -1.642,
+        "z": 1.395,
+        "rotation": -20,
+        "width": 0.8,
+        "depth": 0.8,
+        "height": 0.9,
+        "color": "#8b6f47"
+      },
+      {
+        "id": "detected-3",
+        "kind": "chair",
+        "x": 1.631,
+        "z": 1.734,
+        "rotation": 25,
+        "width": 0.8,
+        "depth": 0.8,
+        "height": 0.9,
+        "color": "#8b6f47"
+      },
+      {
+        "id": "detected-4",
+        "kind": "table",
+        "x": 0,
+        "z": 0.37,
+        "rotation": 0,
+        "width": 1.2,
+        "depth": 0.6,
+        "height": 0.45,
+        "color": "#a0733a"
+      },
+      {
+        "id": "detected-6",
+        "kind": "table",
+        "x": -2.1,
+        "z": 0,
+        "rotation": 0,
+        "width": 0.5,
+        "depth": 0.4,
+        "height": 0.6,
+        "color": "#8b6634"
+      },
+      {
+        "id": "detected-7",
+        "kind": "plant",
+        "x": -2.17,
+        "z": -1.925,
+        "rotation": 0,
+        "width": 0.3,
+        "depth": 0.3,
+        "height": 0.5,
+        "color": "#2d5016"
+      },
+      {
+        "id": "detected-8",
+        "kind": "plant",
+        "x": 2.065,
+        "z": -1.5,
+        "rotation": 0,
+        "width": 0.6,
+        "depth": 0.5,
+        "height": 1.5,
+        "color": "#3a6b2f"
+      },
+      {
+        "id": "detected-11",
+        "kind": "plant",
+        "x": 0,
+        "z": 0.39,
+        "rotation": 0,
+        "width": 0.2,
+        "depth": 0.2,
+        "height": 0.3,
+        "color": "#4a7c59"
+      }
+    ]
+  },
+  "warnings": [
+    "Las dimensiones de la habitación son estimaciones visuales basadas en perspectiva; no representan medidas verificadas",
+    "La profundidad exacta es difícil de determinar debido al ángulo de la cámara y la perspectiva forzada",
+    "Algunos elementos decorativos menores pueden no estar identificados completamente",
+    "La posición de elementos en el eje u-v es estimada a partir de la perspectiva visual, no de coordenadas precisas",
+    "La altura de algunos muebles es aproximada basándose en proporciones relativas",
+    "No se ha verificado la escala real de los objetos; las dimensiones son relativas al espacio estimado",
+    "Pufés de cuero marrón: sin modelo compatible; no se generó.",
+    "Lámpara de arco dorada: sin modelo compatible; no se generó.",
+    "Cuadro horizontal pared: sin modelo compatible; no se generó."
+  ],
+  "grpcVerified": {
+    "saved": true,
+    "recovered": true,
+    "recoveredAfterRestart": true,
+    "temporaryProjectDeleted": true
+  }
+}

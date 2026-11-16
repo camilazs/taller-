@@ -1,5 +1,46 @@
 # Registro de validación — 13 de octubre de 2026
 
+## Actualización Claude — 14 de noviembre de 2026
+
+- Proyecto localizado en su ubicación actual: UNIVERSIDAD/proyecto mideros/taller. Se conservaron editor, persistencia, servicios gRPC y funcionalidad de Meshy/GLB existente.
+- La clave autorizada por el usuario fue aceptada por GET /v1/models de Anthropic (HTTP 200); los valores no se registraron en los resultados ni en la documentación.
+- Adaptador nativo POST /v1/messages con imágenes base64, herramienta de salida estricta y validación Zod. OpenAI se conserva como proveedor alternativo mediante AI_PROVIDER.
+- Se verificó un análisis **real** de una fotografía pública de una sala: https://unsplash.com/photos/9M66C_w_ToM . Modelo: claude-haiku-4-5-20251001. Tiempo de la petición satisfactoria: 14495 ms.
+- Resultado real: 11 objetos observados, 8 geometrías editables compatibles y 3 objetos sin modelo, informados y omitidos.
+- Evidencia sin claves: docs/claude-validacion-real.json. No es un fixture de detecciones inventadas.
+- Esa misma escena se guardó y recuperó por gRPC real, se reinició el servidor y se recuperó de nuevo. Se eliminó únicamente el proyecto temporal de verificación.
+- npm run typecheck: código 0. npm test: **25 pruebas aprobadas, 0 fallidas**. Incluye el contrato Claude con HTTP sustituido solo en pruebas, errores, rechazo, límites, timeout y conservación de compatibilidad con OpenAI, gRPC y GLB.
+- Se escaneó el código fuente, pruebas, scripts y evidencia: 0 literales de claves Anthropic. La clave configurada reside en .env.local y .env.vercel, excluidos de Git; no se modificaron las contraseñas/tokens existentes.
+- La prueba real detectó fallos de salida no estricta y de objetos sin modelo con espesor menor a 0.1 m. Se corrigieron usando modo estricto, esquema anyOf compatible con Claude y dimensiones mínimas distintas solo para observaciones unsupported. Los muebles compatibles conservan los límites originales. No se omite la validación para forzar un resultado satisfactorio.
+- Turbopack falló internamente creando un proceso de PostCSS en esta ubicación de Windows. Se usó Webpack y se ajustaron los scripts dev/start para certificados de sistema, sin desactivar TLS.
+- Guía de variables y despliegue: CLAUDE_DESPLIEGUE.md. No se ejecutaron operaciones de Git ni despliegues. Sigue pendiente provisionar/configurar el backend cloud si solo se desplegó Vercel.
+- La integración Claude produce análisis y escena paramétrica aproximada; no genera mallas GLB por sí sola. La función GLB existente sigue requiriendo la clave y créditos de Meshy.
+- Por haberse compartido la clave en el chat, se recomienda revocarla y reemplazarla antes del despliegue definitivo.
+
+Las secciones que indicaban ausencia de credenciales o de prueba real describen el estado histórico previo a esta actualización.
+
+## Continuación verificada · 26 de octubre de 2026
+
+- `npm.cmd test`: **20 aprobadas, 0 fallidas**, incluidos los ocho RPC (dos nuevos de modelos), persistencia tras reinicio, GLB sintético de más de 5 MB, descarga HTTP por streaming y apertura con Three.js GLTFLoader.
+- `npm.cmd run build -- --webpack`: código 0; TypeScript y todas las rutas compilados. Se verificó `proto/space.proto` en el trazado de la función de modelos.
+- Turbopack falla en este entorno al crear/conectar su proceso de estilos. No se cambió el script predeterminado.
+- Next.js emitió una advertencia de vulnerabilidad; no se alteraron versiones sin autorización. Es necesaria revisión antes de publicar.
+- Producción pública: `/api/analyze` 200 con IA desactivada, `/api/projects` 503 por configuración, `/api/models` 404. No se cambió el despliegue.
+- No hay claves Meshy/visión en archivos locales ni entorno de proceso. Pruebas de contrato con HTTP simulado, **no generaciones ni detecciones reales**.
+- Prueba visual aislada en `3104`, backend temporal `50072`: GLB sintético **no generado con IA** renderizado, seleccionado, movido a X=1, girado 45° y ancho ajustado a 2 m; guardado y reapertura conservaron los valores. Descarga desde el objeto recuperado completada. Evidencia `docs/glb-verificado-prueba.jpg`.
+- El primer intento de vista previa coincidió con la regeneración de `.next` y falló por un manifiesto temporalmente ausente. Se resolvió arrancando después del build, sin alterar protecciones del navegador.
+- Detalles de recuperación, inventario de los 28 archivos previos, limitaciones y ejecución: `../RECUPERACION.md`. Las entradas siguientes se conservan como historial anterior.
+
+## Diagnóstico posterior de Vercel
+
+- Consulta pública a `https://taller-beta-gray.vercel.app/api/projects`: 503, `Configura APP_PASSWORD para proteger la aplicación`.
+- Consulta a `/api/analyze`: `configured:false`, `authRequired:true`.
+- El usuario confirmó que únicamente desplegó el frontend en Vercel. Falta un backend gRPC público.
+- Se generaron una contraseña de aplicación y un token gRPC en `.env.vercel` / `.env.grpc`, excluidos de Git y Docker, sin sobrescribir archivos ni credenciales existentes. No se configuraron en Vercel ni se generaron claves de IA.
+- Se diferenciaron errores de acceso (401), configuración (503), backend inaccesible (503/504) y token gRPC incorrecto (502). Vercel sin GRPC_ADDRESS ya no intenta silenciosamente localhost.
+- `npm test`: 15 pruebas aprobadas, 0 fallidas, incluida configuración de producción sin contraseña y sin backend.
+- Instrucciones concretas en `DESPLIEGUE_URGENTE.md`. La nube sigue pendiente de configurar variables y desplegar backend; no se declara resuelta ni se han creado recursos de pago.
+
 ## Actualización: flujo completo de análisis y revisión
 
 Se completó la integración existente conservando el editor, los seis métodos gRPC, el contrato `.proto`, la persistencia y las configuraciones de Fly.io/Vercel. No se instalaron dependencias nuevas.
@@ -81,3 +122,15 @@ Pendientes: prueba real de visión con credenciales, calidad espacial con fotogr
 - Una recarga automática del servidor interrumpió el primer selector de archivos; al reabrir el proyecto y repetir, la vista previa JPEG funcionó.
 
 No se ejecutaron operaciones de Git, no se desplegó y no se crearon servicios de pago.
+
+Resultado final de esta actualización: npm run build (Webpack) terminó con código 0, incluidas TypeScript, generación de páginas y trazado para despliegue. El backend local se inició en 50051 y Next.js en 3100 con la configuración Claude de .env.local.
+
+
+## Parche de seguridad aplicado
+
+Se actualizó la dependencia existente Next.js de 16.4.0 a 16.4.6 y su package-lock.json. La auditoría de npm posterior reportó 0 vulnerabilidades conocidas. Esta actualización corrige los avisos que interrumpieron el primer arranque local; no se crearon ramas ni worktrees y no se ejecutó Git.
+
+Referencia oficial del aviso: https://github.com/advisories/GHSA-2464-fhr4-w9xw . Las 25 pruebas automatizadas se repitieron después de actualizar.
+
+Cierre verificado: build de Next.js 16.4.6 (Webpack) con código 0; 25 pruebas aprobadas tras el parche; test:smoke contra localhost:3100 aprobado con creación, guardado, recuperación y eliminación del proyecto temporal. Frontend y backend locales permanecen activos. No se desplegó ni se ejecutó Git.
+
